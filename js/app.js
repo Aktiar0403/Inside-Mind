@@ -932,8 +932,6 @@ toggleReport(headerElement) {
         expandIcon.textContent = '➕';
     }
 }
-// Continue with your existing methods below...
-    }
     
     // Helper method to strip HTML from reports
     stripHTML(html) {
