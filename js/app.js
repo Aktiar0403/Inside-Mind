@@ -714,69 +714,147 @@ class PsychometricApp {
         return card;
     }
     
-    async showReports() {
-        this.showScreen('resultScreen');
-        await this.renderReports();
-    }
+  async showReports() {
+    this.showScreen('resultScreen');
+    await this.renderSuperpowerDashboard();
+}
     
-    async renderReports() {
+    async renderSuperpowerDashboard() {
+    try {
         // Update user greeting
         const userGreetingElement = document.getElementById('userGreeting');
-        if (userGreetingElement) userGreetingElement.textContent = `Here are your personalized insights, ${this.state.userName}.`;
-        
-        // Display results summary
-        const resultsSummary = document.getElementById('resultsSummary');
-        if (!resultsSummary) return;
-        
-        resultsSummary.innerHTML = '';
-        
-        for (const [category, result] of Object.entries(this.state.results)) {
-            const levelText = ScoringAlgorithm.getLevelLabel(result.level);
-            const levelColor = ScoringAlgorithm.getLevelColor(result.level);
-            
-            const categoryResult = document.createElement('div');
-            categoryResult.className = 'category-result';
-            categoryResult.style.borderLeft = `4px solid ${levelColor}`;
-            categoryResult.innerHTML = `
-                <div class="category-name">${category}</div>
-                <div class="category-score" style="color: ${levelColor}">${result.overall.toFixed(1)}</div>
-                <div class="category-level">${levelText}</div>
-            `;
-            
-            resultsSummary.appendChild(categoryResult);
+        if (userGreetingElement) {
+            userGreetingElement.textContent = `Here's your unique psychological profile, ${this.state.userName}!`;
         }
+
+        // Step 1: Render Quick Stats
+        this.renderQuickStats();
+
+        // Step 2: Render Growth Plan
+        this.renderGrowthPlan();
+
+        // Step 3: Render MD Reports
+        await this.renderMDReports();
+
+    } catch (error) {
+        console.error('Error rendering superpower dashboard:', error);
+    }
+}}
+   renderQuickStats() {
+    const quickStatsElement = document.getElementById('quickStats');
+    if (!quickStatsElement) return;
+
+    let statsHTML = '';
+
+    // Calculate overall score
+    const overallScore = Object.values(this.state.results).reduce((sum, result) => sum + result.overall, 0) / Object.keys(this.state.results).length;
+    
+    // Create stat cards for each category
+    for (const [category, result] of Object.entries(this.state.results)) {
+        const levelLabel = ScoringAlgorithm.getLevelLabel(result.level);
+        const levelColor = ScoringAlgorithm.getLevelColor(result.level);
         
-        // Load and display reports
-        const reportsContainer = document.getElementById('reportsContainer');
-        if (!reportsContainer) return;
-        
-        reportsContainer.innerHTML = '';
-        
-        for (const [category, result] of Object.entries(this.state.results)) {
-            try {
-                const reportContent = await ReportLoader.loadReport(category, result.level);
-                
-                const reportSection = document.createElement('div');
-                reportSection.className = 'report-section';
-                
-                const reportHeader = document.createElement('div');
-                reportHeader.className = 'report-header';
-                reportHeader.innerHTML = `<h3 class="report-title">${category} - Level ${result.level} (${ScoringAlgorithm.getLevelLabel(result.level)})</h3>`;
-                
-                const reportContentDiv = document.createElement('div');
-                reportContentDiv.className = 'report-content';
-                reportContentDiv.innerHTML = reportContent;
-                
-                reportSection.appendChild(reportHeader);
-                reportSection.appendChild(reportContentDiv);
-                
-                reportsContainer.appendChild(reportSection);
-            } catch (error) {
-                console.error(`Error loading report for ${category}:`, error);
-            }
+        statsHTML += `
+            <div class="stat-card">
+                <div class="stat-value" style="color: ${levelColor}">${result.overall.toFixed(1)}</div>
+                <div class="stat-label">${category}</div>
+                <div class="stat-level">${levelLabel}</div>
+            </div>
+        `;
+    }
+
+    // Add overall score card
+    const overallLevel = ScoringAlgorithm.determineLevel(overallScore);
+    const overallColor = ScoringAlgorithm.getLevelColor(overallLevel);
+    
+    statsHTML = `
+        <div class="stat-card">
+            <div class="stat-value" style="color: ${overallColor}">${overallScore.toFixed(1)}</div>
+            <div class="stat-label">Overall Score</div>
+            <div class="stat-level">${ScoringAlgorithm.getLevelLabel(overallLevel)}</div>
+        </div>
+    ` + statsHTML;
+
+    quickStatsElement.innerHTML = statsHTML;
+}
+
+renderGrowthPlan() {
+    const planStepsElement = document.getElementById('planSteps');
+    if (!planStepsElement) return;
+
+    // Find the category with lowest score for focus
+    let lowestCategory = '';
+    let lowestScore = 5; // Start with highest possible
+    
+    for (const [category, result] of Object.entries(this.state.results)) {
+        if (result.overall < lowestScore) {
+            lowestScore = result.overall;
+            lowestCategory = category;
         }
     }
-    
+
+    const growthPlan = [
+        { emoji: '📝', text: 'Daily: Practice 5 minutes of mindfulness meditation' },
+        { emoji: '🎯', text: 'Weekly: Set one learning goal and track progress' },
+        { emoji: '🔄', text: 'Bi-weekly: Review and reflect on your growth' },
+        { emoji: '🌟', text: `Monthly: Focus on improving your ${lowestCategory} skills` }
+    ];
+
+    let planHTML = '';
+    growthPlan.forEach((step, index) => {
+        planHTML += `
+            <div class="plan-step">
+                <span class="step-emoji">${step.emoji}</span>
+                <span class="step-text">${step.text}</span>
+            </div>
+        `;
+    });
+
+    planStepsElement.innerHTML = planHTML;
+}
+
+async renderMDReports() {
+    const reportsContainer = document.getElementById('reportsContainer');
+    if (!reportsContainer) return;
+
+    let reportsHTML = '';
+
+    for (const [category, result] of Object.entries(this.state.results)) {
+        try {
+            const reportContent = await ReportLoader.loadReport(category, result.level);
+            const levelLabel = ScoringAlgorithm.getLevelLabel(result.level);
+            
+            reportsHTML += `
+                <div class="report-card">
+                    <div class="report-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="report-title">
+                            <span class="category-emoji">${this.getCategoryEmoji(category)}</span>
+                            <span>${category} - ${levelLabel}</span>
+                        </div>
+                        <div class="report-expand">➕</div>
+                    </div>
+                    <div class="report-content">
+                        <div class="md-content">${reportContent}</div>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            console.error(`Error loading report for ${category}:`, error);
+        }
+    }
+
+    reportsContainer.innerHTML = reportsHTML;
+}
+
+getCategoryEmoji(category) {
+    const emojis = {
+        'Emotional': '🎭',
+        'Resilience': '💪', 
+        'Growth': '🌱',
+        'Overthinking': '🤔'
+    };
+    return emojis[category] || '📊';
+} 
     async downloadPDFReport() {
         try {
             // Show loading state
