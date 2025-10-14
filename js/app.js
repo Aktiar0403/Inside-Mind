@@ -41,20 +41,23 @@ class PsychometricApp {
     setupEventListeners() {
         console.log('Setting up event listeners...');
         
-        // Language selector events
-        const languageOptions = document.querySelectorAll('.language-option-prominent');
-        if (languageOptions.length > 0) {
-            languageOptions.forEach(option => {
-                option.addEventListener('click', (e) => {
-                    const lang = e.currentTarget.dataset.lang;
-                    console.log('Language selected:', lang);
-                    this.changeLanguage(lang);
-                });
-            });
-            console.log('Language event listeners added');
-        } else {
-            console.warn('Language options not found');
-        }
+        // Question screen language selector events
+      
+const questionLanguageOptions = document.querySelectorAll('.language-option-question');
+if (questionLanguageOptions.length > 0) {
+    questionLanguageOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            const lang = e.currentTarget.dataset.lang;
+            console.log('Question screen language selected:', lang);
+            
+            // Update BOTH intro screen and question screen selectors
+            this.updateAllLanguageSelectors(lang);
+            this.changeLanguage(lang);
+        });
+    });
+    console.log('Question screen language event listeners added');
+}
+        
         
         // Start button
         const startBtn = document.getElementById('startBtn');
@@ -117,21 +120,37 @@ if (exampleToggle) {
             this.refreshCurrentQuestion();
         }
     }
-    
     updateLanguageUI(lang) {
-        console.log('Updating UI for language:', lang);
-        
-        // Update prominent language selector
-        const languageOptions = document.querySelectorAll('.language-option-prominent');
-        if (languageOptions.length > 0) {
-            languageOptions.forEach(option => {
-                option.classList.toggle('active', option.dataset.lang === lang);
-            });
-        }
-        
-        // Update any language-specific text
-        this.updateStaticText(lang);
+    console.log('Updating UI for language:', lang);
+    
+    // Update ALL language selectors
+    this.updateAllLanguageSelectors(lang);
+    
+    // Update any language-specific text
+    this.updateStaticText(lang);
+    
+    // Force question refresh if on question screen
+    this.refreshCurrentQuestion();
+}
+   updateAllLanguageSelectors(lang) {
+    console.log('Updating all language selectors to:', lang);
+    
+    // Update prominent language selector (intro screen)
+    const prominentOptions = document.querySelectorAll('.language-option-prominent');
+    if (prominentOptions.length > 0) {
+        prominentOptions.forEach(option => {
+            option.classList.toggle('active', option.dataset.lang === lang);
+        });
     }
+    
+    // Update question screen language selector
+    const questionOptions = document.querySelectorAll('.language-option-question');
+    if (questionOptions.length > 0) {
+        questionOptions.forEach(option => {
+            option.classList.toggle('active', option.dataset.lang === lang);
+        });
+    }
+}
     
     updateStaticText(lang) {
         console.log('Updating static text for:', lang);
