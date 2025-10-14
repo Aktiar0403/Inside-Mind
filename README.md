@@ -1,1 +1,2 @@
-# Inside-Mind
+# Mindfullness
+Testing Mind to Improve 
