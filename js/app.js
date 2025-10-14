@@ -740,7 +740,61 @@ class PsychometricApp {
         console.error('Error rendering superpower dashboard:', error);
     }
 }}
-   renderQuickStats() {
+    
+    async downloadPDFReport() {
+        try {
+            // Show loading state
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn) {
+                const originalText = downloadBtn.textContent;
+                downloadBtn.textContent = 'Generating PDF...';
+                downloadBtn.disabled = true;
+                
+                // Collect all report content
+                const reportsContent = {};
+                for (const [category, result] of Object.entries(this.state.results)) {
+                    try {
+                        const report = await ReportLoader.loadReport(category, result.level);
+                        reportsContent[category] = this.stripHTML(report);
+                    } catch (error) {
+                        console.error(`Error loading report for ${category}:`, error);
+                        reportsContent[category] = `Report for ${category} - Level ${result.level} not available.`;
+                    }
+                }
+                
+                // Get user data
+                const userData = DataManager.getUserData(this.state.userId) || {
+                    demographics: this.state.demographics,
+                    responses: this.state.answers
+                };
+                
+                // Generate PDF
+                const success = await PDFGenerator.generateReport(
+                    userData, 
+                    this.state.results, 
+                    reportsContent
+                );
+                
+                if (success) {
+                    console.log('PDF report generated successfully');
+                }
+                
+                // Restore button state
+                downloadBtn.textContent = originalText;
+                downloadBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error generating PDF report:', error);
+            alert('Error generating PDF report. Please try again.');
+            
+            // Restore button state on error
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn) {
+                downloadBtn.textContent = 'Download Full Report';
+                downloadBtn.disabled = false;
+            }
+        }
+        renderQuickStats() {
     const quickStatsElement = document.getElementById('quickStats');
     if (!quickStatsElement) return;
 
@@ -854,60 +908,7 @@ getCategoryEmoji(category) {
         'Overthinking': '🤔'
     };
     return emojis[category] || '📊';
-} 
-    async downloadPDFReport() {
-        try {
-            // Show loading state
-            const downloadBtn = document.getElementById('downloadBtn');
-            if (downloadBtn) {
-                const originalText = downloadBtn.textContent;
-                downloadBtn.textContent = 'Generating PDF...';
-                downloadBtn.disabled = true;
-                
-                // Collect all report content
-                const reportsContent = {};
-                for (const [category, result] of Object.entries(this.state.results)) {
-                    try {
-                        const report = await ReportLoader.loadReport(category, result.level);
-                        reportsContent[category] = this.stripHTML(report);
-                    } catch (error) {
-                        console.error(`Error loading report for ${category}:`, error);
-                        reportsContent[category] = `Report for ${category} - Level ${result.level} not available.`;
-                    }
-                }
-                
-                // Get user data
-                const userData = DataManager.getUserData(this.state.userId) || {
-                    demographics: this.state.demographics,
-                    responses: this.state.answers
-                };
-                
-                // Generate PDF
-                const success = await PDFGenerator.generateReport(
-                    userData, 
-                    this.state.results, 
-                    reportsContent
-                );
-                
-                if (success) {
-                    console.log('PDF report generated successfully');
-                }
-                
-                // Restore button state
-                downloadBtn.textContent = originalText;
-                downloadBtn.disabled = false;
-            }
-        } catch (error) {
-            console.error('Error generating PDF report:', error);
-            alert('Error generating PDF report. Please try again.');
-            
-            // Restore button state on error
-            const downloadBtn = document.getElementById('downloadBtn');
-            if (downloadBtn) {
-                downloadBtn.textContent = 'Download Full Report';
-                downloadBtn.disabled = false;
-            }
-        }
+}
     }
     
     // Helper method to strip HTML from reports
@@ -1040,7 +1041,7 @@ getCategoryEmoji(category) {
         // If all questions are answered, go to results
         this.calculateResults();
     }
-
+}
 
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
