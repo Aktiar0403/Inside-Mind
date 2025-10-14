@@ -913,8 +913,7 @@ getCategoryEmoji(category) {
     return emojis[category] || '📊';
 }
 
-// Continue with your existing methods below...
-    }
+
     
     // Helper method to strip HTML from reports
     stripHTML(html) {
