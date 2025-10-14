@@ -879,7 +879,8 @@ async renderMDReports() {
 
     for (const [category, result] of Object.entries(this.state.results)) {
         try {
-            const reportContent = await ReportLoader.loadReport(category, result.level);
+            const rawReport = await ReportLoader.loadReport(category, result.level);
+            const parsedReport = ReportParser.parseMarkdownReport(rawReport);
             const levelLabel = ScoringAlgorithm.getLevelLabel(result.level);
             
             reportsHTML += `
@@ -892,18 +893,114 @@ async renderMDReports() {
                         <div class="report-expand">➕</div>
                     </div>
                     <div class="report-content">
-                        <div class="md-content">${reportContent}</div>
+                        ${this.renderParsedReport(parsedReport)}
                     </div>
                 </div>
             `;
         } catch (error) {
             console.error(`Error loading report for ${category}:`, error);
+            // Fallback to raw content
+            reportsHTML += this.createFallbackReport(category, result.level, rawReport);
         }
     }
 
     reportsContainer.innerHTML = reportsHTML;
 }
-
+renderParsedReport(parsedReport) {
+    let html = '';
+    
+    // Hero Section
+    if (parsedReport.title || parsedReport.description) {
+        html += `
+            <div class="report-hero">
+                <h3>${parsedReport.title || ''}</h3>
+                <p class="hero-description">${parsedReport.description || ''}</p>
+            </div>
+        `;
+    }
+    
+    // Key Characteristics
+    if (parsedReport.keyCharacteristics.length > 0) {
+        html += this.renderSection('keyCharacteristics', parsedReport.keyCharacteristics);
+    }
+    
+    // Daily Impact
+    if (parsedReport.dailyImpact.length > 0) {
+        html += this.renderSection('dailyImpact', parsedReport.dailyImpact);
+    }
+    
+    // Development Strategy
+    if (parsedReport.developmentStrategy.length > 0) {
+        html += this.renderSection('developmentStrategy', parsedReport.developmentStrategy);
+    }
+    
+    // Recommended Exercises
+    if (parsedReport.recommendedExercises.length > 0) {
+        html += this.renderSection('recommendedExercises', parsedReport.recommendedExercises);
+    }
+    
+    return html;
+}
+renderSection(sectionName, items) {
+    const icon = ReportParser.getSectionIcon(sectionName);
+    const title = ReportParser.getSectionTitle(sectionName);
+    
+    let itemsHTML = '';
+    
+    if (sectionName === 'keyCharacteristics') {
+        // Grid layout for characteristics
+        itemsHTML = `
+            <div class="trait-grid">
+                ${items.map(item => `
+                    <div class="trait-card">
+                        <div class="trait-icon">${icon}</div>
+                        <p>${item}</p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        // List layout for other sections
+        itemsHTML = `
+            <div class="section-list">
+                ${items.map(item => `
+                    <div class="list-item">
+                        <span class="list-bullet">•</span>
+                        <span class="list-text">${item}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    return `
+        <div class="report-section ${sectionName}">
+            <div class="section-header">
+                <span class="section-icon">${icon}</span>
+                <h4>${title}</h4>
+            </div>
+            ${itemsHTML}
+        </div>
+    `;
+}
+createFallbackReport(category, level, rawContent) {
+    const levelLabel = ScoringAlgorithm.getLevelLabel(level);
+    
+    return `
+        <div class="report-card">
+            <div class="report-header" onclick="psychometricApp.toggleReport(this)">
+                <div class="report-title">
+                    <span class="category-emoji">${this.getCategoryEmoji(category)}</span>
+                    <span>${category} - ${levelLabel}</span>
+                </div>
+                <div class="report-expand">➕</div>
+            </div>
+            <div class="report-content">
+                <div class="md-content">${rawContent || 'Report not available.'}</div>
+            </div>
+        </div>
+    `;
+}
 getCategoryEmoji(category) {
     const emojis = {
         'Emotional': '🎭',
