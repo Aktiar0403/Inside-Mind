@@ -1040,7 +1040,7 @@ getCategoryEmoji(category) {
         // If all questions are answered, go to results
         this.calculateResults();
     }
-}
+
 
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
