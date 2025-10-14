@@ -1,4 +1,4 @@
-// js/app.js - Complete Psychometric Test Application
+// js/app.js - Complete Psychometric Test Application with Sentiment Slider
 class PsychometricApp {
     constructor() {
         this.state = {
@@ -14,6 +14,7 @@ class PsychometricApp {
             analytics: {}
         };
         
+        this.isDragging = false; // Add this for slider
         this.initializeApp();
     }
     
@@ -39,45 +40,42 @@ class PsychometricApp {
     }
     
     setupEventListeners() {
-    console.log('Setting up event listeners...');
-    
-    // === ADD THIS SECTION FOR INTRO SCREEN LANGUAGE SELECTOR ===
-    // Intro screen language selector events
-    const introLanguageOptions = document.querySelectorAll('.language-option-prominent');
-    if (introLanguageOptions.length > 0) {
-        introLanguageOptions.forEach(option => {
-            option.addEventListener('click', (e) => {
-                const lang = e.currentTarget.dataset.lang;
-                console.log('Intro screen language selected:', lang);
-                
-                // Update BOTH intro screen and question screen selectors
-                this.updateAllLanguageSelectors(lang);
-                this.changeLanguage(lang);
+        console.log('Setting up event listeners...');
+        
+        // === INTRO SCREEN LANGUAGE SELECTOR ===
+        const introLanguageOptions = document.querySelectorAll('.language-option-prominent');
+        if (introLanguageOptions.length > 0) {
+            introLanguageOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const lang = e.currentTarget.dataset.lang;
+                    console.log('Intro screen language selected:', lang);
+                    
+                    // Update BOTH intro screen and question screen selectors
+                    this.updateAllLanguageSelectors(lang);
+                    this.changeLanguage(lang);
+                });
             });
-        });
-        console.log('Intro screen language event listeners added');
-    }
-    
-    // Question screen language selector events (your existing code)
-    const questionLanguageOptions = document.querySelectorAll('.language-option-question');
-    if (questionLanguageOptions.length > 0) {
-        questionLanguageOptions.forEach(option => {
-            option.addEventListener('click', (e) => {
-                const lang = e.currentTarget.dataset.lang;
-                console.log('Question screen language selected:', lang);
-                
-                // Update BOTH intro screen and question screen selectors
-                this.updateAllLanguageSelectors(lang);
-                this.changeLanguage(lang);
+            console.log('Intro screen language event listeners added');
+        }
+        
+        // === QUESTION SCREEN LANGUAGE SELECTOR ===
+        const questionLanguageOptions = document.querySelectorAll('.language-option-question');
+        if (questionLanguageOptions.length > 0) {
+            questionLanguageOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const lang = e.currentTarget.dataset.lang;
+                    console.log('Question screen language selected:', lang);
+                    
+                    // Update BOTH intro screen and question screen selectors
+                    this.updateAllLanguageSelectors(lang);
+                    this.changeLanguage(lang);
+                });
             });
-        });
-        console.log('Question screen language event listeners added');
-    }
-    // === END OF ADDED SECTION ===
-    
-    // Rest of your existing event listeners...
-
-
+            console.log('Question screen language event listeners added');
+        }
+        
+        // === SENTIMENT SLIDER EVENTS ===
+        this.setupSliderEvents();
         
         // Start button
         const startBtn = document.getElementById('startBtn');
@@ -103,19 +101,11 @@ class PsychometricApp {
         const nextBtn = document.getElementById('nextBtn');
         if (nextBtn) nextBtn.addEventListener('click', () => this.handleAnswer());
 
-       // Example toggle event
-const exampleToggle = document.getElementById('exampleToggle');
-if (exampleToggle) {
-    exampleToggle.addEventListener('click', () => this.toggleExample());
-} 
-        
-        // Option selection
-        document.querySelectorAll('.option-input').forEach(input => {
-            input.addEventListener('change', () => {
-                const nextBtn = document.getElementById('nextBtn');
-                if (nextBtn) nextBtn.disabled = false;
-            });
-        });
+        // Example toggle event
+        const exampleToggle = document.getElementById('exampleToggle');
+        if (exampleToggle) {
+            exampleToggle.addEventListener('click', () => this.toggleExample());
+        } 
         
         // Analytics and Results events
         const viewReportsBtn = document.getElementById('viewReportsBtn');
@@ -133,6 +123,131 @@ if (exampleToggle) {
         console.log('All event listeners setup complete');
     }
     
+    // ===== SENTIMENT SLIDER METHODS =====
+    setupSliderEvents() {
+        const slider = document.getElementById('sentimentSlider');
+        const sliderTrack = document.querySelector('.slider-track');
+        
+        if (!slider || !sliderTrack) return;
+        
+        // Mouse events
+        slider.addEventListener('mousedown', (e) => this.startDrag(e));
+        document.addEventListener('mousemove', (e) => this.drag(e));
+        document.addEventListener('mouseup', () => this.stopDrag());
+        
+        // Touch events for mobile
+        slider.addEventListener('touchstart', (e) => this.startDrag(e));
+        document.addEventListener('touchmove', (e) => this.drag(e));
+        document.addEventListener('touchend', () => this.stopDrag());
+        
+        // Click on track to move thumb
+        sliderTrack.addEventListener('click', (e) => {
+            this.moveToPosition(e.clientX || e.touches[0].clientX);
+        });
+    }
+    
+    startDrag(e) {
+        this.isDragging = true;
+        this.moveToPosition(e.clientX || e.touches[0].clientX);
+        e.preventDefault();
+    }
+    
+    drag(e) {
+        if (!this.isDragging) return;
+        this.moveToPosition(e.clientX || e.touches[0].clientX);
+        e.preventDefault();
+    }
+    
+    stopDrag() {
+        this.isDragging = false;
+    }
+    
+    moveToPosition(clientX) {
+        const slider = document.getElementById('sentimentSlider');
+        const thumb = document.getElementById('sliderThumb');
+        const sliderFill = document.getElementById('sliderFill');
+        const thumbValue = document.getElementById('thumbValue');
+        const sliderEmotion = document.getElementById('sliderEmotion');
+        const sliderText = document.getElementById('sliderText');
+        const sentimentValue = document.getElementById('sentimentValue');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        if (!slider || !thumb) return;
+        
+        const sliderRect = slider.getBoundingClientRect();
+        const sliderWidth = sliderRect.width;
+        const sliderLeft = sliderRect.left;
+        
+        // Calculate position (0 to 1)
+        let position = (clientX - sliderLeft) / sliderWidth;
+        position = Math.max(0, Math.min(1, position)); // Clamp between 0-1
+        
+        // Convert to value 1-5
+        const value = Math.round(position * 4) + 1;
+        
+        // Calculate percentage for thumb position (10% padding on sides)
+        const thumbPosition = (position * 80) + 10;
+        
+        // Update UI
+        thumb.style.left = `${thumbPosition}%`;
+        sliderFill.style.width = `${thumbPosition}%`;
+        thumbValue.textContent = value;
+        sentimentValue.value = value;
+        
+        // Update emotion and text based on value
+        this.updateSliderDisplay(value);
+        
+        // Enable next button
+        if (nextBtn) nextBtn.disabled = false;
+    }
+    
+    updateSliderDisplay(value) {
+        const sliderEmotion = document.getElementById('sliderEmotion');
+        const sliderText = document.getElementById('sliderText');
+        
+        if (!sliderEmotion || !sliderText) return;
+        
+        const emotions = {
+            1: { emoji: '😠', text: 'Strongly Disagree', color: '#e53e3e' },
+            2: { emoji: '😕', text: 'Disagree', color: '#ed8936' },
+            3: { emoji: '😐', text: 'Neutral', color: '#f6e05e' },
+            4: { emoji: '😊', text: 'Agree', color: '#68d391' },
+            5: { emoji: '😄', text: 'Strongly Agree', color: '#38a169' }
+        };
+        
+        const current = emotions[value] || emotions[3];
+        
+        sliderEmotion.textContent = current.emoji;
+        sliderEmotion.style.color = current.color;
+        sliderEmotion.setAttribute('data-value', value);
+        
+        sliderText.textContent = current.text;
+        sliderText.style.color = current.color;
+    }
+    
+    resetSlider() {
+        const thumb = document.getElementById('sliderThumb');
+        const sliderFill = document.getElementById('sliderFill');
+        const thumbValue = document.getElementById('thumbValue');
+        const sentimentValue = document.getElementById('sentimentValue');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        if (thumb && sliderFill) {
+            // Reset to neutral position (value 3)
+            thumb.style.left = '50%';
+            sliderFill.style.width = '50%';
+            thumbValue.textContent = '3';
+            sentimentValue.value = '3';
+            
+            // Update display
+            this.updateSliderDisplay(3);
+            
+            // Disable next button until user interacts
+            if (nextBtn) nextBtn.disabled = true;
+        }
+    }
+    
+    // ===== LANGUAGE METHODS =====
     changeLanguage(lang) {
         console.log('Changing language to:', lang);
         if (LanguageManager.setLanguage(lang)) {
@@ -140,37 +255,39 @@ if (exampleToggle) {
             this.refreshCurrentQuestion();
         }
     }
+    
     updateLanguageUI(lang) {
-    console.log('Updating UI for language:', lang);
-    
-    // Update ALL language selectors
-    this.updateAllLanguageSelectors(lang);
-    
-    // Update any language-specific text
-    this.updateStaticText(lang);
-    
-    // Force question refresh if on question screen
-    this.refreshCurrentQuestion();
-}
-   updateAllLanguageSelectors(lang) {
-    console.log('Updating all language selectors to:', lang);
-    
-    // Update prominent language selector (intro screen)
-    const prominentOptions = document.querySelectorAll('.language-option-prominent');
-    if (prominentOptions.length > 0) {
-        prominentOptions.forEach(option => {
-            option.classList.toggle('active', option.dataset.lang === lang);
-        });
+        console.log('Updating UI for language:', lang);
+        
+        // Update ALL language selectors
+        this.updateAllLanguageSelectors(lang);
+        
+        // Update any language-specific text
+        this.updateStaticText(lang);
+        
+        // Force question refresh if on question screen
+        this.refreshCurrentQuestion();
     }
     
-    // Update question screen language selector
-    const questionOptions = document.querySelectorAll('.language-option-question');
-    if (questionOptions.length > 0) {
-        questionOptions.forEach(option => {
-            option.classList.toggle('active', option.dataset.lang === lang);
-        });
+    updateAllLanguageSelectors(lang) {
+        console.log('Updating all language selectors to:', lang);
+        
+        // Update prominent language selector (intro screen)
+        const prominentOptions = document.querySelectorAll('.language-option-prominent');
+        if (prominentOptions.length > 0) {
+            prominentOptions.forEach(option => {
+                option.classList.toggle('active', option.dataset.lang === lang);
+            });
+        }
+        
+        // Update question screen language selector
+        const questionOptions = document.querySelectorAll('.language-option-question');
+        if (questionOptions.length > 0) {
+            questionOptions.forEach(option => {
+                option.classList.toggle('active', option.dataset.lang === lang);
+            });
+        }
     }
-}
     
     updateStaticText(lang) {
         console.log('Updating static text for:', lang);
@@ -209,6 +326,24 @@ if (exampleToggle) {
         }
     }
     
+    // ===== EXAMPLE TOGGLE METHOD =====
+    toggleExample() {
+        const exampleElement = document.getElementById('questionExample');
+        const toggleIcon = document.querySelector('.toggle-icon');
+        const toggleText = document.querySelector('.toggle-text');
+        
+        if (exampleElement.style.display === 'none') {
+            exampleElement.style.display = 'block';
+            toggleIcon.textContent = '➖';
+            toggleText.textContent = 'Hide Example';
+        } else {
+            exampleElement.style.display = 'none';
+            toggleIcon.textContent = '➕';
+            toggleText.textContent = 'Show Example';
+        }
+    }
+    
+    // ===== MAIN APP METHODS =====
     startTest() {
         const name = document.getElementById('userName').value.trim();
         const age = parseInt(document.getElementById('userAge').value);
@@ -254,21 +389,7 @@ if (exampleToggle) {
         
         return true;
     }
-    toggleExample() {
-    const exampleElement = document.getElementById('questionExample');
-    const toggleIcon = document.querySelector('.toggle-icon');
-    const toggleText = document.querySelector('.toggle-text');
     
-    if (exampleElement.style.display === 'none') {
-        exampleElement.style.display = 'block';
-        toggleIcon.textContent = '➖';
-        toggleText.textContent = 'Hide Example';
-    } else {
-        exampleElement.style.display = 'none';
-        toggleIcon.textContent = '➕';
-        toggleText.textContent = 'Show Example';
-    }
-}
     loadCurrentQuestion() {
         const category = QuestionManager.getCategories()[this.state.currentCategoryIndex];
         const subcategories = QuestionManager.getSubcategories(category);
@@ -305,28 +426,27 @@ if (exampleToggle) {
         if (questionTextElement) questionTextElement.textContent = questionText;
 
         // Handle question examples
-const exampleText = QuestionManager.getQuestionExample(question);
-const exampleElement = document.getElementById('questionExample');
-const toggleElement = document.getElementById('exampleToggle');
-const toggleIcon = toggleElement.querySelector('.toggle-icon');
-const toggleText = toggleElement.querySelector('.toggle-text');
-
-if (exampleText) {
-    exampleElement.innerHTML = exampleText;
-    toggleElement.style.display = 'flex';
-    // Reset to collapsed state for new question
-    exampleElement.style.display = 'none';
-    toggleIcon.textContent = '➕';
-    toggleText.textContent = 'Show Example';
-} else {
-    exampleElement.innerHTML = '';
-    toggleElement.style.display = 'none';
-}
+        const exampleText = QuestionManager.getQuestionExample(question);
+        const exampleElement = document.getElementById('questionExample');
+        const toggleElement = document.getElementById('exampleToggle');
         
-        // Reset radio buttons
-        document.querySelectorAll('.option-input').forEach(input => {
-            input.checked = false;
-        });
+        if (exampleText && exampleElement && toggleElement) {
+            const toggleIcon = toggleElement.querySelector('.toggle-icon');
+            const toggleText = toggleElement.querySelector('.toggle-text');
+            
+            exampleElement.innerHTML = exampleText;
+            toggleElement.style.display = 'flex';
+            // Reset to collapsed state for new question
+            exampleElement.style.display = 'none';
+            toggleIcon.textContent = '➕';
+            toggleText.textContent = 'Show Example';
+        } else if (exampleElement && toggleElement) {
+            exampleElement.innerHTML = '';
+            toggleElement.style.display = 'none';
+        }
+        
+        // Reset sentiment slider to neutral position
+        this.resetSlider();
         
         // Update progress
         this.updateProgress();
@@ -335,22 +455,19 @@ if (exampleText) {
         const backBtn = document.getElementById('backBtn');
         if (backBtn) backBtn.disabled = this.isFirstQuestion();
         
-        const nextBtn = document.getElementById('nextBtn');
-        if (nextBtn) nextBtn.disabled = true;
-        
         // Record timestamp
         this.state.responseTimestamps.push(Date.now());
     }
     
     handleAnswer() {
-        const selectedOption = document.querySelector('input[name="answer"]:checked');
+        const sentimentValue = document.getElementById('sentimentValue');
         
-        if (!selectedOption) {
+        if (!sentimentValue || !sentimentValue.value) {
             alert("Please select an answer before continuing.");
             return;
         }
         
-        const answerValue = parseInt(selectedOption.value);
+        const answerValue = parseInt(sentimentValue.value);
         const category = QuestionManager.getCategories()[this.state.currentCategoryIndex];
         const subcategory = QuestionManager.getSubcategories(category)[this.state.currentSubcategoryIndex];
         
