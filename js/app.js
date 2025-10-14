@@ -39,25 +39,45 @@ class PsychometricApp {
     }
     
     setupEventListeners() {
-        console.log('Setting up event listeners...');
-        
-        // Question screen language selector events
-      
-const questionLanguageOptions = document.querySelectorAll('.language-option-question');
-if (questionLanguageOptions.length > 0) {
-    questionLanguageOptions.forEach(option => {
-        option.addEventListener('click', (e) => {
-            const lang = e.currentTarget.dataset.lang;
-            console.log('Question screen language selected:', lang);
-            
-            // Update BOTH intro screen and question screen selectors
-            this.updateAllLanguageSelectors(lang);
-            this.changeLanguage(lang);
+    console.log('Setting up event listeners...');
+    
+    // === ADD THIS SECTION FOR INTRO SCREEN LANGUAGE SELECTOR ===
+    // Intro screen language selector events
+    const introLanguageOptions = document.querySelectorAll('.language-option-prominent');
+    if (introLanguageOptions.length > 0) {
+        introLanguageOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                const lang = e.currentTarget.dataset.lang;
+                console.log('Intro screen language selected:', lang);
+                
+                // Update BOTH intro screen and question screen selectors
+                this.updateAllLanguageSelectors(lang);
+                this.changeLanguage(lang);
+            });
         });
-    });
-    console.log('Question screen language event listeners added');
-}
-        
+        console.log('Intro screen language event listeners added');
+    }
+    
+    // Question screen language selector events (your existing code)
+    const questionLanguageOptions = document.querySelectorAll('.language-option-question');
+    if (questionLanguageOptions.length > 0) {
+        questionLanguageOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                const lang = e.currentTarget.dataset.lang;
+                console.log('Question screen language selected:', lang);
+                
+                // Update BOTH intro screen and question screen selectors
+                this.updateAllLanguageSelectors(lang);
+                this.changeLanguage(lang);
+            });
+        });
+        console.log('Question screen language event listeners added');
+    }
+    // === END OF ADDED SECTION ===
+    
+    // Rest of your existing event listeners...
+
+
         
         // Start button
         const startBtn = document.getElementById('startBtn');
