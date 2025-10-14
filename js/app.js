@@ -79,6 +79,12 @@ class PsychometricApp {
         
         const nextBtn = document.getElementById('nextBtn');
         if (nextBtn) nextBtn.addEventListener('click', () => this.handleAnswer());
+
+       // Example toggle event
+const exampleToggle = document.getElementById('exampleToggle');
+if (exampleToggle) {
+    exampleToggle.addEventListener('click', () => this.toggleExample());
+} 
         
         // Option selection
         document.querySelectorAll('.option-input').forEach(input => {
@@ -209,7 +215,21 @@ class PsychometricApp {
         
         return true;
     }
+    toggleExample() {
+    const exampleElement = document.getElementById('questionExample');
+    const toggleIcon = document.querySelector('.toggle-icon');
+    const toggleText = document.querySelector('.toggle-text');
     
+    if (exampleElement.style.display === 'none') {
+        exampleElement.style.display = 'block';
+        toggleIcon.textContent = '➖';
+        toggleText.textContent = 'Hide Example';
+    } else {
+        exampleElement.style.display = 'none';
+        toggleIcon.textContent = '➕';
+        toggleText.textContent = 'Show Example';
+    }
+}
     loadCurrentQuestion() {
         const category = QuestionManager.getCategories()[this.state.currentCategoryIndex];
         const subcategories = QuestionManager.getSubcategories(category);
@@ -244,6 +264,25 @@ class PsychometricApp {
         
         const questionTextElement = document.getElementById('questionText');
         if (questionTextElement) questionTextElement.textContent = questionText;
+
+        // Handle question examples
+const exampleText = QuestionManager.getQuestionExample(question);
+const exampleElement = document.getElementById('questionExample');
+const toggleElement = document.getElementById('exampleToggle');
+const toggleIcon = toggleElement.querySelector('.toggle-icon');
+const toggleText = toggleElement.querySelector('.toggle-text');
+
+if (exampleText) {
+    exampleElement.innerHTML = exampleText;
+    toggleElement.style.display = 'flex';
+    // Reset to collapsed state for new question
+    exampleElement.style.display = 'none';
+    toggleIcon.textContent = '➕';
+    toggleText.textContent = 'Show Example';
+} else {
+    exampleElement.innerHTML = '';
+    toggleElement.style.display = 'none';
+}
         
         // Reset radio buttons
         document.querySelectorAll('.option-input').forEach(input => {
