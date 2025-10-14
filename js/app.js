@@ -124,28 +124,29 @@ class PsychometricApp {
     }
     
     // ===== SENTIMENT SLIDER METHODS =====
-    setupSliderEvents() {
-        const slider = document.getElementById('sentimentSlider');
-        const sliderTrack = document.querySelector('.slider-track');
-        
-        if (!slider || !sliderTrack) return;
-        
-        // Mouse events
-        slider.addEventListener('mousedown', (e) => this.startDrag(e));
-        document.addEventListener('mousemove', (e) => this.drag(e));
-        document.addEventListener('mouseup', () => this.stopDrag());
-        
-        // Touch events for mobile
-        slider.addEventListener('touchstart', (e) => this.startDrag(e));
-        document.addEventListener('touchmove', (e) => this.drag(e));
-        document.addEventListener('touchend', () => this.stopDrag());
-        
-        // Click on track to move thumb
-        sliderTrack.addEventListener('click', (e) => {
-            this.moveToPosition(e.clientX || e.touches[0].clientX);
-        });
-    }
+   setupSliderEvents() {
+    const slider = document.getElementById('sentimentSlider');
+    const sliderTrack = document.querySelector('.slider-track');
     
+    if (!slider || !sliderTrack) return;
+    
+    let isDragging = false;
+    
+    // Mouse events
+    slider.addEventListener('mousedown', (e) => this.startDrag(e));
+    document.addEventListener('mousemove', (e) => this.drag(e));
+    document.addEventListener('mouseup', () => this.stopDrag());
+    
+    // Touch events for mobile (FIXED VERSION)
+    slider.addEventListener('touchstart', (e) => this.startDrag(e), { passive: false });
+    document.addEventListener('touchmove', (e) => this.drag(e), { passive: false });
+    document.addEventListener('touchend', () => this.stopDrag(), { passive: false });
+    
+    // Click on track to move thumb
+    sliderTrack.addEventListener('click', (e) => {
+        this.moveToPosition(e.clientX || e.touches[0].clientX);
+    });
+}
     startDrag(e) {
         this.isDragging = true;
         this.moveToPosition(e.clientX || e.touches[0].clientX);
@@ -883,7 +884,7 @@ async renderMDReports() {
             
             reportsHTML += `
                 <div class="report-card">
-                    <div class="report-header" onclick="this.parentElement.classList.toggle('expanded')">
+                    <div class="report-header" onclick="psychometricApp.toggleReport(this)">
                         <div class="report-title">
                             <span class="category-emoji">${this.getCategoryEmoji(category)}</span>
                             <span>${category} - ${levelLabel}</span>
@@ -912,8 +913,27 @@ getCategoryEmoji(category) {
     };
     return emojis[category] || '📊';
 }
-
-
+toggleReport(headerElement) {
+    const reportCard = headerElement.parentElement;
+    const reportContent = reportCard.querySelector('.report-content');
+    const expandIcon = reportCard.querySelector('.report-expand');
+    
+    // Toggle expanded class
+    reportCard.classList.toggle('expanded');
+    
+    // Toggle content visibility
+    if (reportCard.classList.contains('expanded')) {
+        reportContent.style.maxHeight = reportContent.scrollHeight + 'px';
+        reportContent.classList.add('expanded');
+        expandIcon.textContent = '➖';
+    } else {
+        reportContent.style.maxHeight = '0';
+        reportContent.classList.remove('expanded');
+        expandIcon.textContent = '➕';
+    }
+}
+// Continue with your existing methods below...
+    }
     
     // Helper method to strip HTML from reports
     stripHTML(html) {

@@ -1040,3 +1040,24 @@ body {
     color: #667eea;
     cursor: pointer;
 }
+/* Smooth expand/collapse animation */
+.report-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    padding: 0 25px;
+}
+
+.report-content.expanded {
+    max-height: 2000px;
+    padding: 0 25px 25px 25px;
+}
+
+/* Rotate expand icon */
+.report-card.expanded .report-expand {
+    transform: rotate(45deg);
+}
+
+.report-expand {
+    transition: transform 0.3s ease;
+}
