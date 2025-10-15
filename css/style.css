@@ -1241,3 +1241,6 @@ body {
     .screen { padding: 20px 15px; }
     .question-card { padding: 20px; margin: 15px 0; }
 }
+/* TEST: Add this temporarily */
+.screen { padding: 10px !important; }
+.question-card { padding: 10px !important; margin: 5px 0 !important; }
