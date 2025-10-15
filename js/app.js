@@ -582,6 +582,11 @@ class PsychometricApp {
         // Update UI
         const currentCategoryElement = document.getElementById('currentCategory');
         if (currentCategoryElement) currentCategoryElement.textContent = `${category} - ${subcategory}`;
+
+         const categoryBadge = document.getElementById('currentCategoryBadge');
+            if (categoryBadge) {
+            categoryBadge.textContent = category;
+             }
         
         const currentQuestionNumberElement = document.getElementById('currentQuestionNumber');
         if (currentQuestionNumberElement) currentQuestionNumberElement.textContent = this.state.currentQuestionIndex + 1;
@@ -622,7 +627,7 @@ class PsychometricApp {
         const backBtn = document.getElementById('backBtn');
         if (backBtn) backBtn.disabled = this.isFirstQuestion();
         engagementManager.adjustQuestionPacing();
-    varyQuestionDisplay();
+         varyQuestionDisplay();
         // Record timestamp
         this.state.responseTimestamps.push(Date.now());
     }
