@@ -1155,3 +1155,71 @@ body {
 .list-text {
     flex: 1;
 }
+/* ===== MICRO-INTERACTIONS ===== */
+/* Quick celebration animation */
+@keyframes quickCelebrate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+.answer-selected .question-card {
+    animation: quickCelebrate 0.6s ease;
+}
+
+/* Progress pulse */
+@keyframes progressPulse {
+    0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+}
+
+.progress-milestone {
+    animation: progressPulse 1.5s ease;
+}
+
+/* Quick encouragement toast */
+.encouragement-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--gradient-primary);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: var(--box-shadow-lg);
+    z-index: 1000;
+    transform: translateX(400px);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+}
+
+.encouragement-toast.show {
+    transform: translateX(0);
+}
+
+/* Question card variations */
+.question-card.quick-mode {
+    background: linear-gradient(135deg, rgba(248,252,255,0.95), rgba(240,249,255,0.95));
+    border-left: 4px solid #4299e1;
+}
+
+.question-card.reflection-mode {
+    background: linear-gradient(135deg, rgba(255,248,240,0.95), rgba(254,252,235,0.95));
+    border-left: 4px solid #ed8936;
+}
+
+/* Answer speed indicator */
+.answer-speed {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.question-card:hover .answer-speed {
+    opacity: 1;
+}

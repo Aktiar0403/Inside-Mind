@@ -1,4 +1,169 @@
 // js/app.js - Complete Psychometric Test Application with Sentiment Slider
+// ===== VARIABLE PACING & MICRO-INTERACTIONS =====
+class EngagementManager {
+    constructor() {
+        this.lastAnswerTime = Date.now();
+        this.answerSpeeds = [];
+        this.questionModes = ['default', 'quick', 'reflection'];
+        this.encouragementMessages = [
+            "Great insight! 🎯",
+            "Building self-awareness! 🌱",
+            "This reveals your unique strengths! 💫",
+            "Each answer shapes your profile! 📊",
+            "You're discovering patterns! 🔍",
+            "Building emotional intelligence! 🧠",
+            "This data is gold! 💎",
+            "Uncovering your superpowers! 🦸",
+            "Growth in progress! 📈",
+            "Mindfulness in action! 🪷"
+        ];
+    }
+
+    // Call this when user selects an answer
+    onAnswerSelected() {
+        const now = Date.now();
+        const speed = now - this.lastAnswerTime;
+        this.answerSpeeds.push(speed);
+        this.lastAnswerTime = now;
+
+        // Visual feedback
+        this.triggerMicroCelebration();
+        
+        // Occasionally show encouragement
+        if (Math.random() > 0.7) { // 30% chance
+            this.showEncouragement();
+        }
+
+        // Check for pacing variation
+        this.adjustQuestionPacing();
+    }
+
+    triggerMicroCelebration() {
+        // Add celebration class to question card
+        const questionCard = document.querySelector('.question-card');
+        if (questionCard) {
+            questionCard.classList.add('answer-selected');
+            setTimeout(() => {
+                questionCard.classList.remove('answer-selected');
+            }, 600);
+        }
+
+        // Pulse progress bar on milestones
+        const answered = psychometricApp.getAnsweredQuestionsCount();
+        if (answered % 5 === 0) {
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+                progressFill.classList.add('progress-milestone');
+                setTimeout(() => {
+                    progressFill.classList.remove('progress-milestone');
+                }, 1500);
+            }
+        }
+    }
+
+    showEncouragement() {
+        const message = this.encouragementMessages[
+            Math.floor(Math.random() * this.encouragementMessages.length)
+        ];
+        
+        // Remove existing toast
+        const existingToast = document.querySelector('.encouragement-toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+
+        // Create new toast
+        const toast = document.createElement('div');
+        toast.className = 'encouragement-toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => toast.classList.add('show'), 100);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
+    adjustQuestionPacing() {
+        const answered = psychometricApp.getAnsweredQuestionsCount();
+        const questionCard = document.querySelector('.question-card');
+        if (!questionCard) return;
+
+        // Remove previous modes
+        questionCard.classList.remove('quick-mode', 'reflection-mode');
+
+        // Apply pacing variations based on question number
+        if (answered % 8 === 0) {
+            // Reflection question (every 8 questions)
+            questionCard.classList.add('reflection-mode');
+            this.updateQuestionContext("💭 Deep Reflection");
+        } else if (answered % 5 === 0) {
+            // Quick question (every 5 questions)
+            questionCard.classList.add('quick-mode');
+            this.updateQuestionContext("⚡ Quick Insight");
+        } else {
+            this.updateQuestionContext("🎯 Core Assessment");
+        }
+    }
+
+    updateQuestionContext(context) {
+        let contextElement = document.getElementById('questionContext');
+        if (!contextElement) {
+            contextElement = document.createElement('div');
+            contextElement.id = 'questionContext';
+            contextElement.style.cssText = `
+                text-align: center;
+                font-size: 0.9rem;
+                color: var(--text-muted);
+                margin-bottom: 10px;
+                font-weight: 600;
+            `;
+            const questionHeader = document.querySelector('.question-header');
+            if (questionHeader) {
+                questionHeader.appendChild(contextElement);
+            }
+        }
+        contextElement.textContent = context;
+    }
+
+    getAverageSpeed() {
+        if (this.answerSpeeds.length === 0) return 0;
+        return this.answerSpeeds.reduce((a, b) => a + b, 0) / this.answerSpeeds.length;
+    }
+}
+
+// Initialize engagement manager
+let engagementManager;
+
+// ===== QUICK PACING VARIATIONS =====
+function varyQuestionDisplay() {
+    const answered = psychometricApp.getAnsweredQuestionsCount();
+    const questionText = document.getElementById('questionText');
+    
+    if (!questionText) return;
+
+    // Occasionally emphasize key words
+    if (answered % 7 === 0) {
+        const text = questionText.textContent;
+        // Simple emphasis on key emotional words
+        const emphasized = text.replace(/(feelings?|emotions?|understand|aware)/gi, 
+            '<span style="color: var(--primary-color); font-weight: 600;">$1</span>');
+        questionText.innerHTML = emphasized;
+    }
+
+    // Quick questions get a different visual treatment
+    if (answered % 4 === 0) {
+        questionText.style.fontSize = '1.3rem';
+        questionText.style.fontWeight = '500';
+    } else {
+        questionText.style.fontSize = '';
+        questionText.style.fontWeight = '';
+    }
+}
 class PsychometricApp {
     constructor() {
         this.state = {
@@ -15,6 +180,7 @@ class PsychometricApp {
         };
         
         this.isDragging = false; // Add this for slider
+        engagementManager = new EngagementManager();
         this.initializeApp();
     }
     
@@ -455,13 +621,17 @@ class PsychometricApp {
         // Enable/disable navigation
         const backBtn = document.getElementById('backBtn');
         if (backBtn) backBtn.disabled = this.isFirstQuestion();
-        
+        engagementManager.adjustQuestionPacing();
+    varyQuestionDisplay();
         // Record timestamp
         this.state.responseTimestamps.push(Date.now());
     }
     
     handleAnswer() {
-        const sentimentValue = document.getElementById('sentimentValue');
+        engagementManager.onAnswerSelected();
+    
+    const sentimentValue = document.getElementById('sentimentValue');
+        
         
         if (!sentimentValue || !sentimentValue.value) {
             alert("Please select an answer before continuing.");
