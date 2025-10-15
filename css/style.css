@@ -1264,3 +1264,59 @@ body {
     font-size: 1.5rem !important;
     margin: 5px 0 !important;
 }
+/* ===== LARGER CATEGORY BADGE ===== */
+.category-badge {
+    display: inline-block;
+    background: var(--gradient-primary);
+    color: white;
+    padding: 12px 24px !important; /* Larger padding */
+    border-radius: 25px !important;
+    font-size: 1.1rem !important; /* Larger font */
+    font-weight: 700 !important; /* Bolder */
+    margin-bottom: 15px !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+}
+
+/* Make the subcategory title slightly smaller to emphasize the badge */
+.category-title {
+    font-size: 1.4rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    color: var(--text-primary);
+}
+
+/* Optional: Add emojis based on category */
+.category-badge[data-category="Emotional"]::before {
+    content: "🎭 ";
+}
+
+.category-badge[data-category="Resilience"]::before {
+    content: "💪 ";
+}
+
+.category-badge[data-category="Growth"]::before {
+    content: "🌱 ";
+}
+
+.category-badge[data-category="Overthinking"]::before {
+    content: "🤔 ";
+}
+/* Category-specific colors */
+.category-emotional {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+}
+
+.category-resilience {
+    background: linear-gradient(135deg, #f093fb, #f5576c) !important;
+}
+
+.category-growth {
+    background: linear-gradient(135deg, #4facfe, #00f2fe) !important;
+}
+
+.category-overthinking {
+    background: linear-gradient(135deg, #a8edea, #fed6e3) !important;
+    color: #2d3748 !important;
+}

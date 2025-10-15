@@ -557,45 +557,57 @@ class PsychometricApp {
         return true;
     }
     
-    loadCurrentQuestion() {
-        const category = QuestionManager.getCategories()[this.state.currentCategoryIndex];
-        const subcategories = QuestionManager.getSubcategories(category);
-        
-        if (subcategories.length === 0) {
-            this.moveToNextQuestion();
-            return;
-        }
-        
-        const subcategory = subcategories[this.state.currentSubcategoryIndex];
-        const questions = QuestionManager.getQuestions(category, subcategory);
-        
-        if (questions.length === 0) {
-            this.moveToNextQuestion();
-            return;
-        }
-        
-        const question = questions[this.state.currentQuestionIndex];
-        
-        // Use multi-language text
-        const questionText = QuestionManager.getQuestionText(question);
-        
-        // Update UI
-        const currentCategoryElement = document.getElementById('currentCategory');
-        if (currentCategoryElement) currentCategoryElement.textContent = `${category} - ${subcategory}`;
+   loadCurrentQuestion() {
+    const category = QuestionManager.getCategories()[this.state.currentCategoryIndex];
+    const subcategories = QuestionManager.getSubcategories(category);
+    
+    if (subcategories.length === 0) {
+        this.moveToNextQuestion();
+        return;
+    }
+    
+    const subcategory = subcategories[this.state.currentSubcategoryIndex];
+    const questions = QuestionManager.getQuestions(category, subcategory);
+    
+    if (questions.length === 0) {
+        this.moveToNextQuestion();
+        return;
+    }
+    
+    const question = questions[this.state.currentQuestionIndex];
+    const questionText = QuestionManager.getQuestionText(question);
 
-         const categoryBadge = document.getElementById('currentCategoryBadge');
-            if (categoryBadge) {
-            categoryBadge.textContent = category;
-             }
-        
-        const currentQuestionNumberElement = document.getElementById('currentQuestionNumber');
-        if (currentQuestionNumberElement) currentQuestionNumberElement.textContent = this.state.currentQuestionIndex + 1;
-        
-        const totalQuestionsElement = document.getElementById('totalQuestions');
-        if (totalQuestionsElement) totalQuestionsElement.textContent = questions.length;
-        
-        const questionTextElement = document.getElementById('questionText');
-        if (questionTextElement) questionTextElement.textContent = questionText;
+    // === UPDATED: Category badge (large) + Subcategory only in title ===
+    const currentCategoryElement = document.getElementById('currentCategory');
+    if (currentCategoryElement) {
+        currentCategoryElement.textContent = subcategory; // Only subcategory name
+    }
+    
+    // Update the category badge with just the main category
+    const categoryBadge = document.getElementById('currentCategoryBadge');
+    if (categoryBadge) {
+        categoryBadge.textContent = category; // Just "Resilience", "Emotional", etc.
+    }
+
+    // Rest of your existing code remains the same...
+    const currentQuestionNumberElement = document.getElementById('currentQuestionNumber');
+    if (currentQuestionNumberElement) currentQuestionNumberElement.textContent = this.state.currentQuestionIndex + 1;
+    
+    const totalQuestionsElement = document.getElementById('totalQuestions');
+    if (totalQuestionsElement) totalQuestionsElement.textContent = questions.length;
+    
+    const questionTextElement = document.getElementById('questionText');
+    if (questionTextElement) questionTextElement.textContent = questionText;
+
+    const categoryBadge = document.getElementById('currentCategoryBadge');
+        if (categoryBadge) {
+    categoryBadge.textContent = category;
+    
+    // Set category-specific colors
+        categoryBadge.className = 'category-badge'; // Reset classes
+        categoryBadge.classList.add(`category-${category.toLowerCase()}`);
+        categoryBadge.setAttribute('data-category', category);
+        }
 
         // Handle question examples
         const exampleText = QuestionManager.getQuestionExample(question);
