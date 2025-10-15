@@ -1522,3 +1522,52 @@ body {
         inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
     color: #6b5c3d !important;
 }
+/* Color-coded cards based on category */
+.report-card[data-category="Emotional"] .report-section {
+    border-top: 4px solid #667eea !important;
+}
+
+.report-card[data-category="Resilience"] .report-section {
+    border-top: 4px solid #f093fb !important;
+}
+
+.report-card[data-category="Growth"] .report-section {
+    border-top: 4px solid #4facfe !important;
+}
+
+.report-card[data-category="Overthinking"] .report-section {
+    border-top: 4px solid #a8edea !important;
+}
+/* CARD-BASED REPORTS - QUICK FIX */
+.report-content {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 20px !important;
+    padding: 0 !important;
+}
+
+.report-section {
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+}
+
+.section-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 15px !important;
+    border-bottom: 2px solid #667eea !important;
+    padding-bottom: 10px !important;
+}
+
+.trait-card,
+.list-item {
+    background: #f8fafc !important;
+    padding: 12px 15px !important;
+    border-radius: 8px !important;
+    margin-bottom: 10px !important;
+    border-left: 3px solid #667eea !important;
+}
