@@ -1356,3 +1356,77 @@ body {
     border-radius: 20px;
     overflow: hidden;
 }
+/* ===== COLORFUL CARD BACKGROUNDS ===== */
+
+/* Intro screen main card */
+.intro-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Language selector card */
+.language-selector-prominent {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* User input form area */
+.user-input {
+    background: rgba(255, 255, 255, 0.9) !important;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+}
+
+/* Question card */
+.question-card {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Sentiment slider container */
+.sentiment-slider-container {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Progress container */
+.progress-container {
+    background: rgba(255, 255, 255, 0.9) !important;
+    padding: 15px;
+    border-radius: 15px;
+    margin: 20px 0;
+}
+
+/* Navigation buttons */
+.navigation-buttons {
+    background: rgba(255, 255, 255, 0.9) !important;
+    padding: 15px;
+    border-radius: 15px;
+    margin-top: 20px;
+}
+
+/* Analytics cards */
+.analytics-card {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important;
+    color: #2d3748 !important;
+    border: none !important;
+}
+
+/* Result screen cards */
+.report-card {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
+    color: #2d3748 !important;
+    border: none !important;
+}
+
+/* Quick stats cards */
+.stat-card {
+    background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%) !important;
+    color: #2d3748 !important;
+    border: none !important;
+}
