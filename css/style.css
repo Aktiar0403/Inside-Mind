@@ -1356,3 +1356,18 @@ body {
     border-radius: 20px;
     overflow: hidden;
 }
+/* Glass morphism effect for app content */
+.question-card,
+.sentiment-slider-container,
+.intro-content,
+.analytics-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+}
+
+/* Keep the outer background subtle */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
