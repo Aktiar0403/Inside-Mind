@@ -1244,3 +1244,23 @@ body {
 /* TEST: Add this temporarily */
 .screen { padding: 10px !important; }
 .question-card { padding: 10px !important; margin: 5px 0 !important; }
+/* Quick slider space reduction */
+.sentiment-slider-container {
+    margin: 10px 0 !important;
+    padding: 10px !important;
+}
+
+.sentiment-slider {
+    height: 30px !important;
+    margin: 5px 0 !important;
+}
+
+.slider-thumb {
+    width: 25px !important;
+    height: 25px !important;
+}
+
+.slider-emotion {
+    font-size: 1.5rem !important;
+    margin: 5px 0 !important;
+}
