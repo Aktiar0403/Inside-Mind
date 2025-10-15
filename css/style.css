@@ -1320,3 +1320,24 @@ body {
     background: linear-gradient(135deg, #a8edea, #fed6e3) !important;
     color: #2d3748 !important;
 }
+/* ===== LOGO STYLING ===== */
+.main-logo {
+    width: 120px; /* Adjust based on your logo size */
+    height: 120px;
+    border-radius: 20px; /* Optional: rounded corners */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.main-logo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* Make sure the app-logo container is properly centered */
+.app-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
