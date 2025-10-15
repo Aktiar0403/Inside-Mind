@@ -1393,3 +1393,28 @@ body {
     border-radius: 15px;
     padding: 15px;
 }
+/* Different colors for each question category */
+.question-card[data-category="Emotional"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+}
+
+.question-card[data-category="Resilience"] {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+    color: white !important;
+}
+
+.question-card[data-category="Growth"] {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+    color: white !important;
+}
+
+.question-card[data-category="Overthinking"] {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%) !important;
+    color: #2d3748 !important;
+}
+
+.sentiment-slider-container {
+    background: rgba(255,255,255,0.9) !important;
+    color: #2d3748 !important;
+}
