@@ -599,15 +599,7 @@ class PsychometricApp {
     const questionTextElement = document.getElementById('questionText');
     if (questionTextElement) questionTextElement.textContent = questionText;
 
-    const categoryBadge = document.getElementById('currentCategoryBadge');
-        if (categoryBadge) {
-    categoryBadge.textContent = category;
     
-    // Set category-specific colors
-        categoryBadge.className = 'category-badge'; // Reset classes
-        categoryBadge.classList.add(`category-${category.toLowerCase()}`);
-        categoryBadge.setAttribute('data-category', category);
-        }
 
         // Handle question examples
         const exampleText = QuestionManager.getQuestionExample(question);
