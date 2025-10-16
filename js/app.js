@@ -1360,35 +1360,7 @@ launchMiniGame(category, callback) {
 
 
 }
-    // 🎮 Mini Game Overlay Launcher
-    function launchMiniGame(gameName) {
-     const overlay = document.createElement("div");
-    overlay.id = "gameOverlay";
-     overlay.style.cssText = `
-    position:fixed;top:0;left:0;width:100%;height:100%;
-    background:#0008;display:flex;align-items:center;
-    justify-content:center;z-index:9999;
-  `;
-     overlay.innerHTML = `
-    <iframe src="games/${gameName}/${gameName}.html"
-            style="width:100%;height:100%;border:none;border-radius:0"></iframe>
-  `;
-     document.body.appendChild(overlay);
-
-      window.addEventListener("message", function handler(e) {
-       if (e.data.type === "gameComplete") {
-       document.body.removeChild(overlay);
-      window.removeEventListener("message", handler);
-      console.log("Game completed:", e.data);
-      // optional: store score
-      localStorage.setItem(`game_${gameName}_score`, e.data.score);
-      // resume normal app flow
-      psychometricApp.showScreen('resultScreen'); // or next section
-             }
-     });
-
-}
-
+   
     // Initialize the application when the DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing app...');
