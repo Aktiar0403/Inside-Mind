@@ -1,99 +1,100 @@
-/* =========================
-   funWorkingMemoryGame.js
-   ========================= */
-
 class FunWorkingMemoryGame {
-    constructor(containerId, onComplete) {
-        this.container = document.getElementById(containerId);
+    constructor(onComplete) {
         this.onComplete = onComplete;
         this.sequence = [];
-        this.userSequence = [];
-        this.level = 1;
-        this.maxLevel = 5;
-        this.colors = ['🟥','🟦','🟩','🟨']; // fun emoji buttons
+        this.userInput = [];
+        this.currentStep = 0;
+        this.maxSteps = 4; // Starting difficulty
         this.startGame();
     }
 
     startGame() {
-        this.container.innerHTML = `
-            <div class="game-header" style="font-size:18px; font-weight:bold; color:#667eea;">🎯 Working Memory Challenge</div>
-            <div id="gameMessage" style="margin:10px 0; font-size:16px;">Level ${this.level}</div>
-            <div id="gameButtons" style="display:flex; gap:10px; margin:20px 0;"></div>
-            <button id="skipLevelBtn" style="padding:5px 10px; background:#f6ad55; border:none; border-radius:5px; cursor:pointer;">Skip Level ⏭️</button>
-        `;
-
-        this.userSequence = [];
-        this.generateSequence();
-        this.renderButtons();
-        this.playSequence();
-        document.getElementById('skipLevelBtn').onclick = () => this.nextLevel();
-    }
-
-    generateSequence() {
-        this.sequence = [];
-        for (let i = 0; i < this.level + 2; i++) {
-            const randIndex = Math.floor(Math.random() * this.colors.length);
-            this.sequence.push(this.colors[randIndex]);
+        const container = document.getElementById("gameContainer");
+        if (!container) {
+            console.warn("Game container not found!");
+            this.onComplete();
+            return;
         }
-    }
 
-    renderButtons() {
-        const buttonsDiv = document.getElementById('gameButtons');
-        buttonsDiv.innerHTML = '';
-        this.colors.forEach(color => {
-            const btn = document.createElement('button');
-            btn.innerText = color;
-            btn.style.fontSize = '30px';
-            btn.style.padding = '10px 15px';
-            btn.style.cursor = 'pointer';
-            btn.style.border = '2px solid #667eea';
-            btn.style.borderRadius = '10px';
-            btn.onclick = () => this.handleClick(color);
-            buttonsDiv.appendChild(btn);
+        container.style.display = "flex";
+        container.innerHTML = `<h2>🎮 Fun Memory Game!</h2>
+                               <p>Memorize the sequence of emojis</p>
+                               <div id="emojiDisplay" style="font-size:3rem; margin:20px;"></div>
+                               <button id="startGameBtn" style="padding:10px 20px; font-size:1.2rem; margin-top:20px;">Start!</button>`;
+
+        document.getElementById("startGameBtn").addEventListener("click", () => {
+            this.nextRound();
         });
     }
 
-    async playSequence() {
-        const msg = document.getElementById('gameMessage');
-        msg.innerText = `Watch the sequence... 👀`;
-        for (const color of this.sequence) {
-            msg.innerText = color;
-            await this.sleep(800);
-            msg.innerText = '';
-            await this.sleep(300);
+    nextRound() {
+        this.sequence = [];
+        this.userInput = [];
+        this.currentStep = 0;
+
+        const emojis = ["😀","😎","🤓","🧐","😱","🤯","😇","🥳"];
+        for (let i = 0; i < this.maxSteps; i++) {
+            const randomIndex = Math.floor(Math.random() * emojis.length);
+            this.sequence.push(emojis[randomIndex]);
         }
-        msg.innerText = `Now repeat the sequence! 🖐️`;
+
+        this.showSequence();
     }
 
-    handleClick(color) {
-        this.userSequence.push(color);
-        const msg = document.getElementById('gameMessage');
-        if (this.userSequence[this.userSequence.length - 1] !== this.sequence[this.userSequence.length - 1]) {
-            msg.innerText = `❌ Wrong! Sequence reset. Try again.`;
-            this.userSequence = [];
-            this.playSequence();
-            return;
-        }
-        if (this.userSequence.length === this.sequence.length) {
-            msg.innerText = `✅ Correct!`;
-            setTimeout(() => this.nextLevel(), 1000);
+    showSequence() {
+        const display = document.getElementById("emojiDisplay");
+        let i = 0;
+
+        const interval = setInterval(() => {
+            display.innerHTML = this.sequence[i];
+            i++;
+            if (i >= this.sequence.length) {
+                clearInterval(interval);
+                display.innerHTML = "❓ Now repeat the sequence!";
+                setTimeout(() => this.collectUserInput(), 500);
+            }
+        }, 800);
+    }
+
+    collectUserInput() {
+        const display = document.getElementById("emojiDisplay");
+        display.innerHTML = "";
+        const container = document.getElementById("gameContainer");
+
+        const emojis = ["😀","😎","🤓","🧐","😱","🤯","😇","🥳"];
+        emojis.forEach(emoji => {
+            const btn = document.createElement("button");
+            btn.innerText = emoji;
+            btn.style.fontSize = "2rem";
+            btn.style.margin = "5px";
+            btn.addEventListener("click", () => this.handleInput(emoji));
+            display.appendChild(btn);
+        });
+    }
+
+    handleInput(emoji) {
+        this.userInput.push(emoji);
+        if (this.userInput.length === this.sequence.length) {
+            this.evaluate();
         }
     }
 
-    nextLevel() {
-        if (this.level >= this.maxLevel) {
-            this.container.innerHTML = `<div style="font-size:18px; color:green;">🎉 You completed the Working Memory Game!</div>`;
-            if (this.onComplete) this.onComplete(this.level);
-            return;
-        }
-        this.level++;
-        this.startGame();
-    }
+    evaluate() {
+        const container = document.getElementById("gameContainer");
+        const display = document.getElementById("emojiDisplay");
 
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        let correct = true;
+        for (let i = 0; i < this.sequence.length; i++) {
+            if (this.sequence[i] !== this.userInput[i]) {
+                correct = false;
+                break;
+            }
+        }
+
+        display.innerHTML = correct ? "🎉 Great memory!" : "😅 Oops! Try next time!";
+        setTimeout(() => {
+            container.style.display = "none";
+            this.onComplete(); // Continue your psychometric test
+        }, 2000);
     }
 }
-
-// Usage example:
-// new FunWorkingMemoryGame('gameContainerId', (score) => console.log('Game done! Score:', score));

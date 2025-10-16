@@ -1346,19 +1346,17 @@ function varyQuestionDisplay() {
     }
     
 launchMiniGame(category, callback) {
-    console.log("🎮 Launching mini-game for category:", category);
+    console.log(`🎮 Launching mini-game for category: ${category}`);
 
-    // ✅ Instantiate the mini-game class
-    if (typeof FunWorkingMemoryGame !== "undefined") {
-        new FunWorkingMemoryGame(() => {
-            console.log("🎯 Mini-game finished. Resuming assessment...");
-            callback();
-        });
+    // You can adjust for specific categories
+    if (category === "Emotional") {
+        new FunWorkingMemoryGame(callback);
     } else {
-        console.warn("FunWorkingMemoryGame class is not defined. Skipping game.");
-        callback(); // fallback: continue test if game not available
+        // If no game defined for category
+        callback();
     }
 }
+
 
 
 }
