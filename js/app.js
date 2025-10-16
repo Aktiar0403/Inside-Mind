@@ -1344,17 +1344,27 @@ function varyQuestionDisplay() {
         // If all questions are answered, go to results
         this.calculateResults();
     }
-    // ✅ Paste here, still inside the class
+    
 launchMiniGame(category, callback) {
-    // Show a game popup or new screen
-    alert(`🎮 Great job finishing ${category}! Now play a short mental skill game.`);
+    // Replace the question screen content with game container
+    const screen = document.getElementById('questionScreen');
+    screen.innerHTML = `<div id="gameContainer" style="padding:20px;"></div>`;
 
-    // For now, simulate game completion after 5 seconds
-    setTimeout(() => {
-        alert("✅ Game completed!");
-        callback(); // continue to next category
-    }, 5000);
+    // Optional fun message before starting
+    const header = document.createElement('div');
+    header.style.fontSize = '18px';
+    header.style.marginBottom = '15px';
+    header.innerText = `🎮 Mini-Game Challenge for "${category}" completed!`;
+    document.getElementById('gameContainer').prepend(header);
+
+    // Start the game
+    new FunWorkingMemoryGame('gameContainer', (score) => {
+        console.log('Mini-game done! Level reached:', score);
+        // Restore question screen or proceed
+        if (callback) callback();
+    });
 }
+
 }
     // 🎮 Mini Game Overlay Launcher
     function launchMiniGame(gameName) {
