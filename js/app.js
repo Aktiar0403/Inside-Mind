@@ -163,8 +163,8 @@ function varyQuestionDisplay() {
         questionText.style.fontSize = '';
         questionText.style.fontWeight = '';
     }
-}
-class PsychometricApp {
+    }
+    class PsychometricApp {
     constructor() {
         this.state = {
             userId: null,
@@ -312,7 +312,7 @@ class PsychometricApp {
     sliderTrack.addEventListener('click', (e) => {
         this.moveToPosition(e.clientX || e.touches[0].clientX);
     });
-}
+    }
     startDrag(e) {
         this.isDragging = true;
         this.moveToPosition(e.clientX || e.touches[0].clientX);
@@ -589,7 +589,6 @@ class PsychometricApp {
         categoryBadge.textContent = category; // Just "Resilience", "Emotional", etc.
     }
 
-    // Rest of your existing code remains the same...
     const currentQuestionNumberElement = document.getElementById('currentQuestionNumber');
     if (currentQuestionNumberElement) currentQuestionNumberElement.textContent = this.state.currentQuestionIndex + 1;
     
@@ -706,35 +705,41 @@ class PsychometricApp {
         this.moveToNextQuestion();
     }
     
-    moveToNextQuestion() {
-        this.state.currentQuestionIndex++;
+   moveToNextQuestion() {
+    this.state.currentQuestionIndex++;
+    
+    const category = QuestionManager.getCategories()[this.state.currentCategoryIndex];
+    const subcategories = QuestionManager.getSubcategories(category);
+    const subcategory = subcategories[this.state.currentSubcategoryIndex];
+    const questions = QuestionManager.getQuestions(category, subcategory);
+    
+    if (this.state.currentQuestionIndex < questions.length) {
+        this.loadCurrentQuestion();
+    } else {
+        this.state.currentSubcategoryIndex++;
+        this.state.currentQuestionIndex = 0;
         
-        const category = QuestionManager.getCategories()[this.state.currentCategoryIndex];
-        const subcategories = QuestionManager.getSubcategories(category);
-        const subcategory = subcategories[this.state.currentSubcategoryIndex];
-        const questions = QuestionManager.getQuestions(category, subcategory);
-        
-        if (this.state.currentQuestionIndex < questions.length) {
+        if (this.state.currentSubcategoryIndex < subcategories.length) {
             this.loadCurrentQuestion();
         } else {
-            this.state.currentSubcategoryIndex++;
-            this.state.currentQuestionIndex = 0;
-            
-            if (this.state.currentSubcategoryIndex < subcategories.length) {
-                this.loadCurrentQuestion();
-            } else {
+            // ✅ Finished all subcategories of the current category
+            // 👉 Launch mini game before next category
+            this.launchMiniGame(category, () => {
+                // callback to continue test after game ends
                 this.state.currentCategoryIndex++;
                 this.state.currentSubcategoryIndex = 0;
                 this.state.currentQuestionIndex = 0;
-                
+
                 if (this.state.currentCategoryIndex < QuestionManager.getCategories().length) {
                     this.loadCurrentQuestion();
                 } else {
                     this.calculateResults();
                 }
-            }
+            });
         }
     }
+    }
+
     
     isFirstQuestion() {
         return this.state.currentCategoryIndex === 0 && 
@@ -894,12 +899,12 @@ class PsychometricApp {
         return card;
     }
     
-async showReports() {
+    async showReports() {
     this.showScreen('resultScreen');
     await this.renderSuperpowerDashboard();
-}
+    }
     
-async renderSuperpowerDashboard() {
+    async renderSuperpowerDashboard() {
     try {
         // Update user greeting
         const userGreetingElement = document.getElementById('userGreeting');
@@ -919,9 +924,9 @@ async renderSuperpowerDashboard() {
     } catch (error) {
         console.error('Error rendering superpower dashboard:', error);
     }
-}
+    }
     
-async downloadPDFReport() {
+    async downloadPDFReport() {
     try {
         // Show loading state
         const downloadBtn = document.getElementById('downloadBtn');
@@ -974,10 +979,10 @@ async downloadPDFReport() {
             downloadBtn.disabled = false;
         }
     }
-}
+    }
 
-// ADD SUPERHERO METHODS HERE (outside downloadPDFReport)
-renderQuickStats() {
+    // ADD SUPERHERO METHODS HERE (outside downloadPDFReport)
+    renderQuickStats() {
     const quickStatsElement = document.getElementById('quickStats');
     if (!quickStatsElement) return;
 
@@ -1013,9 +1018,9 @@ renderQuickStats() {
     ` + statsHTML;
 
     quickStatsElement.innerHTML = statsHTML;
-}
+    }
 
-renderGrowthPlan() {
+    renderGrowthPlan() {
     const planStepsElement = document.getElementById('planSteps');
     if (!planStepsElement) return;
 
@@ -1048,9 +1053,9 @@ renderGrowthPlan() {
     });
 
     planStepsElement.innerHTML = planHTML;
-}
+    }
 
-async renderMDReports() {
+    async renderMDReports() {
     const reportsContainer = document.getElementById('reportsContainer');
     if (!reportsContainer) return;
 
@@ -1084,8 +1089,8 @@ async renderMDReports() {
     }
 
     reportsContainer.innerHTML = reportsHTML;
-}
-renderParsedReport(parsedReport) {
+    }
+    renderParsedReport(parsedReport) {
     let html = '';
     
     // Hero Section
@@ -1119,8 +1124,8 @@ renderParsedReport(parsedReport) {
     }
     
     return html;
-}
-renderSection(sectionName, items) {
+    }
+    renderSection(sectionName, items) {
     const icon = ReportParser.getSectionIcon(sectionName);
     const title = ReportParser.getSectionTitle(sectionName);
     
@@ -1161,8 +1166,8 @@ renderSection(sectionName, items) {
             ${itemsHTML}
         </div>
     `;
-}
-createFallbackReport(category, level, rawContent) {
+    }
+    createFallbackReport(category, level, rawContent) {
     const levelLabel = ScoringAlgorithm.getLevelLabel(level);
     
     return `
@@ -1179,8 +1184,8 @@ createFallbackReport(category, level, rawContent) {
             </div>
         </div>
     `;
-}
-getCategoryEmoji(category) {
+    }
+    getCategoryEmoji(category) {
     const emojis = {
         'Emotional': '🎭',
         'Resilience': '💪', 
@@ -1188,8 +1193,8 @@ getCategoryEmoji(category) {
         'Overthinking': '🤔'
     };
     return emojis[category] || '📊';
-}
-toggleReport(headerElement) {
+    }
+    toggleReport(headerElement) {
     const reportCard = headerElement.parentElement;
     const reportContent = reportCard.querySelector('.report-content');
     const expandIcon = reportCard.querySelector('.report-expand');
@@ -1207,7 +1212,7 @@ toggleReport(headerElement) {
         reportContent.classList.remove('expanded');
         expandIcon.textContent = '➕';
     }
-}
+    }
     
     // Helper method to strip HTML from reports
     stripHTML(html) {
@@ -1310,7 +1315,7 @@ toggleReport(headerElement) {
         }
     }
     
-    findCurrentPosition() {
+         findCurrentPosition() {
         const categories = QuestionManager.getCategories();
         
         for (let catIdx = 0; catIdx < categories.length; catIdx++) {
@@ -1339,10 +1344,49 @@ toggleReport(headerElement) {
         // If all questions are answered, go to results
         this.calculateResults();
     }
+    // ✅ Paste here, still inside the class
+launchMiniGame(category, callback) {
+    // Show a game popup or new screen
+    alert(`🎮 Great job finishing ${category}! Now play a short mental skill game.`);
+
+    // For now, simulate game completion after 5 seconds
+    setTimeout(() => {
+        alert("✅ Game completed!");
+        callback(); // continue to next category
+    }, 5000);
+}
+}
+    // 🎮 Mini Game Overlay Launcher
+    function launchMiniGame(gameName) {
+     const overlay = document.createElement("div");
+    overlay.id = "gameOverlay";
+     overlay.style.cssText = `
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:#0008;display:flex;align-items:center;
+    justify-content:center;z-index:9999;
+  `;
+     overlay.innerHTML = `
+    <iframe src="games/${gameName}/${gameName}.html"
+            style="width:100%;height:100%;border:none;border-radius:0"></iframe>
+  `;
+     document.body.appendChild(overlay);
+
+      window.addEventListener("message", function handler(e) {
+       if (e.data.type === "gameComplete") {
+       document.body.removeChild(overlay);
+      window.removeEventListener("message", handler);
+      console.log("Game completed:", e.data);
+      // optional: store score
+      localStorage.setItem(`game_${gameName}_score`, e.data.score);
+      // resume normal app flow
+      psychometricApp.showScreen('resultScreen'); // or next section
+             }
+     });
+
 }
 
-// Initialize the application when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the application when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing app...');
     window.psychometricApp = new PsychometricApp();
 });
