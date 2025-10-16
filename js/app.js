@@ -1346,24 +1346,20 @@ function varyQuestionDisplay() {
     }
     
 launchMiniGame(category, callback) {
-    // Replace the question screen content with game container
-    const screen = document.getElementById('questionScreen');
-    screen.innerHTML = `<div id="gameContainer" style="padding:20px;"></div>`;
+    console.log("🎮 Launching mini-game for category:", category);
 
-    // Optional fun message before starting
-    const header = document.createElement('div');
-    header.style.fontSize = '18px';
-    header.style.marginBottom = '15px';
-    header.innerText = `🎮 Mini-Game Challenge for "${category}" completed!`;
-    document.getElementById('gameContainer').prepend(header);
-
-    // Start the game
-    new FunWorkingMemoryGame('gameContainer', (score) => {
-        console.log('Mini-game done! Level reached:', score);
-        // Restore question screen or proceed
-        if (callback) callback();
-    });
+    // ✅ Instantiate the mini-game class
+    if (typeof FunWorkingMemoryGame !== "undefined") {
+        new FunWorkingMemoryGame(() => {
+            console.log("🎯 Mini-game finished. Resuming assessment...");
+            callback();
+        });
+    } else {
+        console.warn("FunWorkingMemoryGame class is not defined. Skipping game.");
+        callback(); // fallback: continue test if game not available
+    }
 }
+
 
 }
     // 🎮 Mini Game Overlay Launcher
