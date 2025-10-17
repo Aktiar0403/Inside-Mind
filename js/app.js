@@ -163,8 +163,8 @@ function varyQuestionDisplay() {
         questionText.style.fontSize = '';
         questionText.style.fontWeight = '';
     }
-    }
-    class PsychometricApp {
+}
+class PsychometricApp {
     constructor() {
         this.state = {
             userId: null,
@@ -312,7 +312,7 @@ function varyQuestionDisplay() {
     sliderTrack.addEventListener('click', (e) => {
         this.moveToPosition(e.clientX || e.touches[0].clientX);
     });
-    }
+}
     startDrag(e) {
         this.isDragging = true;
         this.moveToPosition(e.clientX || e.touches[0].clientX);
@@ -589,6 +589,7 @@ function varyQuestionDisplay() {
         categoryBadge.textContent = category; // Just "Resilience", "Emotional", etc.
     }
 
+    // Rest of your existing code remains the same...
     const currentQuestionNumberElement = document.getElementById('currentQuestionNumber');
     if (currentQuestionNumberElement) currentQuestionNumberElement.textContent = this.state.currentQuestionIndex + 1;
     
@@ -705,41 +706,35 @@ function varyQuestionDisplay() {
         this.moveToNextQuestion();
     }
     
-   moveToNextQuestion() {
-    this.state.currentQuestionIndex++;
-    
-    const category = QuestionManager.getCategories()[this.state.currentCategoryIndex];
-    const subcategories = QuestionManager.getSubcategories(category);
-    const subcategory = subcategories[this.state.currentSubcategoryIndex];
-    const questions = QuestionManager.getQuestions(category, subcategory);
-    
-    if (this.state.currentQuestionIndex < questions.length) {
-        this.loadCurrentQuestion();
-    } else {
-        this.state.currentSubcategoryIndex++;
-        this.state.currentQuestionIndex = 0;
+    moveToNextQuestion() {
+        this.state.currentQuestionIndex++;
         
-        if (this.state.currentSubcategoryIndex < subcategories.length) {
+        const category = QuestionManager.getCategories()[this.state.currentCategoryIndex];
+        const subcategories = QuestionManager.getSubcategories(category);
+        const subcategory = subcategories[this.state.currentSubcategoryIndex];
+        const questions = QuestionManager.getQuestions(category, subcategory);
+        
+        if (this.state.currentQuestionIndex < questions.length) {
             this.loadCurrentQuestion();
         } else {
-            // ✅ Finished all subcategories of the current category
-            // 👉 Launch mini game before next category
-            this.launchMiniGame(category, () => {
-                // callback to continue test after game ends
+            this.state.currentSubcategoryIndex++;
+            this.state.currentQuestionIndex = 0;
+            
+            if (this.state.currentSubcategoryIndex < subcategories.length) {
+                this.loadCurrentQuestion();
+            } else {
                 this.state.currentCategoryIndex++;
                 this.state.currentSubcategoryIndex = 0;
                 this.state.currentQuestionIndex = 0;
-
+                
                 if (this.state.currentCategoryIndex < QuestionManager.getCategories().length) {
                     this.loadCurrentQuestion();
                 } else {
                     this.calculateResults();
                 }
-            });
+            }
         }
     }
-    }
-
     
     isFirstQuestion() {
         return this.state.currentCategoryIndex === 0 && 
@@ -899,12 +894,12 @@ function varyQuestionDisplay() {
         return card;
     }
     
-    async showReports() {
+async showReports() {
     this.showScreen('resultScreen');
     await this.renderSuperpowerDashboard();
-    }
+}
     
-    async renderSuperpowerDashboard() {
+async renderSuperpowerDashboard() {
     try {
         // Update user greeting
         const userGreetingElement = document.getElementById('userGreeting');
@@ -924,9 +919,9 @@ function varyQuestionDisplay() {
     } catch (error) {
         console.error('Error rendering superpower dashboard:', error);
     }
-    }
+}
     
-    async downloadPDFReport() {
+async downloadPDFReport() {
     try {
         // Show loading state
         const downloadBtn = document.getElementById('downloadBtn');
@@ -979,10 +974,10 @@ function varyQuestionDisplay() {
             downloadBtn.disabled = false;
         }
     }
-    }
+}
 
-    // ADD SUPERHERO METHODS HERE (outside downloadPDFReport)
-    renderQuickStats() {
+// ADD SUPERHERO METHODS HERE (outside downloadPDFReport)
+renderQuickStats() {
     const quickStatsElement = document.getElementById('quickStats');
     if (!quickStatsElement) return;
 
@@ -1018,9 +1013,9 @@ function varyQuestionDisplay() {
     ` + statsHTML;
 
     quickStatsElement.innerHTML = statsHTML;
-    }
+}
 
-    renderGrowthPlan() {
+renderGrowthPlan() {
     const planStepsElement = document.getElementById('planSteps');
     if (!planStepsElement) return;
 
@@ -1053,9 +1048,9 @@ function varyQuestionDisplay() {
     });
 
     planStepsElement.innerHTML = planHTML;
-    }
+}
 
-    async renderMDReports() {
+async renderMDReports() {
     const reportsContainer = document.getElementById('reportsContainer');
     if (!reportsContainer) return;
 
@@ -1089,8 +1084,8 @@ function varyQuestionDisplay() {
     }
 
     reportsContainer.innerHTML = reportsHTML;
-    }
-    renderParsedReport(parsedReport) {
+}
+renderParsedReport(parsedReport) {
     let html = '';
     
     // Hero Section
@@ -1124,8 +1119,8 @@ function varyQuestionDisplay() {
     }
     
     return html;
-    }
-    renderSection(sectionName, items) {
+}
+renderSection(sectionName, items) {
     const icon = ReportParser.getSectionIcon(sectionName);
     const title = ReportParser.getSectionTitle(sectionName);
     
@@ -1166,8 +1161,8 @@ function varyQuestionDisplay() {
             ${itemsHTML}
         </div>
     `;
-    }
-    createFallbackReport(category, level, rawContent) {
+}
+createFallbackReport(category, level, rawContent) {
     const levelLabel = ScoringAlgorithm.getLevelLabel(level);
     
     return `
@@ -1184,8 +1179,8 @@ function varyQuestionDisplay() {
             </div>
         </div>
     `;
-    }
-    getCategoryEmoji(category) {
+}
+getCategoryEmoji(category) {
     const emojis = {
         'Emotional': '🎭',
         'Resilience': '💪', 
@@ -1193,8 +1188,8 @@ function varyQuestionDisplay() {
         'Overthinking': '🤔'
     };
     return emojis[category] || '📊';
-    }
-    toggleReport(headerElement) {
+}
+toggleReport(headerElement) {
     const reportCard = headerElement.parentElement;
     const reportContent = reportCard.querySelector('.report-content');
     const expandIcon = reportCard.querySelector('.report-expand');
@@ -1212,7 +1207,7 @@ function varyQuestionDisplay() {
         reportContent.classList.remove('expanded');
         expandIcon.textContent = '➕';
     }
-    }
+}
     
     // Helper method to strip HTML from reports
     stripHTML(html) {
@@ -1315,7 +1310,7 @@ function varyQuestionDisplay() {
         }
     }
     
-         findCurrentPosition() {
+    findCurrentPosition() {
         const categories = QuestionManager.getCategories();
         
         for (let catIdx = 0; catIdx < categories.length; catIdx++) {
@@ -1344,25 +1339,10 @@ function varyQuestionDisplay() {
         // If all questions are answered, go to results
         this.calculateResults();
     }
-    
-launchMiniGame(category, callback) {
-    console.log(`🎮 Launching mini-game for category: ${category}`);
-
-    // You can adjust for specific categories
-    if (category === "Emotional") {
-        new FunWorkingMemoryGame(callback);
-    } else {
-        // If no game defined for category
-        callback();
-    }
 }
 
-
-
-}
-   
-    // Initialize the application when the DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
+// Initialize the application when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing app...');
     window.psychometricApp = new PsychometricApp();
 });
